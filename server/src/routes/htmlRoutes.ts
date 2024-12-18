@@ -7,7 +7,7 @@ const router = Router();
 
 // Route to serve index.html
 
-router.get('/', (req, res) => {
+router.get('/', (_, res) => {
     res.sendFile(path.join(__dirname, '../../../client/index.html'), (err) => {
         if (err) {
             console.error('Error serving index.html', err);
