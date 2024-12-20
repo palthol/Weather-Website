@@ -7,7 +7,7 @@ const router = Router();
 const searchHistory: { id: number; city: string; timestamp: Date }[] = [];
 
 // POST Request with city name to retrieve weather data
-router.post('/', async (req: Request, res: Response) => {
+router.post('/weather', async (req: Request, res: Response) => {
   const { city } = req.body;
 
   // Validate input
