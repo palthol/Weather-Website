@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     port: 3000, // Development server port
     open: true, // Open the browser when the server starts
-    proxy: {
+      proxy: {
       '/api': {
         target: 'http://localhost:3001', // Backend server
         changeOrigin: true,

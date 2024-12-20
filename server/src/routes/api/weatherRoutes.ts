@@ -45,7 +45,7 @@ router.post('/weather', async (req: Request, res: Response) => {
 });
 
 // GET search history
-router.get('/history', (_: Request, res: Response) => {
+router.get('/history', async (_: Request, res: Response) => {
   // Return search history
   return res.status(200).json(searchHistory);
 });

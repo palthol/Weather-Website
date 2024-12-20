@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 import routes from './routes/index.js';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT ?? 3001;
 
 // Serve static files
 app.use(express.static(path.join(__dirname, '../../client/dist')));
