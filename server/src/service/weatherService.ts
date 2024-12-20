@@ -12,7 +12,7 @@ class Weather {
 
 class WeatherService {
   private readonly baseURL = 'https://api.openweathermap.org/data/2.5';
-  private readonly apiKey = process.env.OPENWEATHER_API_KEY || '';
+  private readonly apiKey = process.env.OPENWEATHER_API_KEY ?? '';
   private readonly cityName: string;
 
   constructor(cityName: string) {
@@ -39,7 +39,7 @@ class WeatherService {
   }
 
   private destructureLocationData(locationData: any): { lat: number; lon: number } {
-    if (!locationData || !locationData.coord) {
+    if (!locationData?.coord) {
       throw new Error('Invalid location data received from API.');
     }
     return {

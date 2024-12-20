@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Import routes
-import routes from './routes/index.js';
+import routes from './routes/centralRouter.js';
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // API routes
-app.use('/api', routes);
+app.use('/', routes);
 
 // SPA fallback for frontend routing
 app.get('*', (_, res) => {
