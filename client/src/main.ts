@@ -28,13 +28,12 @@ const humidityEl: HTMLParagraphElement = document.getElementById(
   'humidity'
 ) as HTMLParagraphElement;
 
-/*
+/* API Calls */
+// The backend only needs to handle the three API endpoints.
+// The rest of main.ts strictly belongs to frontend logic.
+// Your primary concern is handling these API calls and making them functional on the backend.
 
-API Calls
 
-*/
-
-// fetch w
 
 const fetchWeather = async (cityName: string) => {
   const response = await fetch('/api/weather/', {
@@ -72,11 +71,7 @@ const deleteCityFromHistory = async (id: string) => {
   });
 };
 
-/*
-
-Render Functions
-
-*/
+/* Render Functions */
 
 const renderCurrentWeather = (currentWeather: any): void => {
   const { city, date, icon, iconDescription, tempF, windSpeed, humidity } =
@@ -160,11 +155,7 @@ const renderSearchHistory = async (searchHistory: any) => {
   }
 };
 
-/*
-
-Helper Functions
-
-*/
+/* Helper Functions*/
 
 const createForecastCard = () => {
   const col = document.createElement('div');
@@ -245,11 +236,7 @@ const buildHistoryListItem = (city: any) => {
   return historyDiv;
 };
 
-/*
-
-Event Handlers
-
-*/
+/* Event Handlers */
 
 const handleSearchFormSubmit = (event: any): void => {
   event.preventDefault();
@@ -278,11 +265,7 @@ const handleDeleteHistoryClick = (event: any) => {
   deleteCityFromHistory(cityID).then(getAndRenderHistory);
 };
 
-/*
-
-Initial Render
-
-*/
+/* Initial Render */
 
 const getAndRenderHistory = () =>
   fetchSearchHistory().then(renderSearchHistory);

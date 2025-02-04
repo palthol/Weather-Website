@@ -7,7 +7,7 @@ class City {
 }
 
 class HistoryService {
-  private filePath = path.join(__dirname, 'searchHistory.json');
+  private readonly filePath = path.join(__dirname, 'searchHistory.json');
 
   // Read from searchHistory.json
   private async read(): Promise<City[]> {

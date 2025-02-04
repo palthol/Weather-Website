@@ -1,32 +1,97 @@
-import express from 'express';
-import weatherRoutes from './api/weatherRoutes.js'; // Weather-specific routes
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import express, { Request, Response, Router } from "express";
+import dotenv from "dotenv";
+import HistoryService from "../service/historyService";
+import { getWeather } from "../service/weatherService";
 
+dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const router: Router = express.Router();
 
-const router = express.Router();
+// ============================
+// API Routes
+// ============================
 
+/**
+ * GET /api/weather/:city
+ * Fetches weather data for a given city.
+ */
+router.get("/:city", async (req: Request, res: Response) => {
+  const { city } = req.params;
 
-// Route to serve index.html
-router.get('/', (req, res) => {
-    const filePath = path.resolve(__dirname, '../../../client/index.html');
-    res.sendFile(filePath, (err) => {
-        if (err) {
-            console.error(`Error serving file`, err);
+  try {
+    const weatherData = await getWeather(city);
+    return res.json(weatherData);
 
-
-            const statusCode = (err as any).status || 500;
-            res.status(statusCode).send('Error serving the HTML file');
-        }
-    });
+    // error handling
+  } catch (error) {
+    console.error("Error fetching weather:", error);
+    return res.status(500).json({ error: "Failed to fetch weather data" });
+  }
 });
 
-// Mount API routes
-router.use('/api/weather', weatherRoutes);
+/**
+ * POST /api/weather
+ * Saves a city to search history and returns weather data.
+ */
+router.post("/", async (req: Request, res: Response) => {
+  const { city } = req.body;
 
+  if (!city) {
+    return res.status(400).json({ error: "City name is required" });
+  }
+  try {
+    const historyResponse = await HistoryService.addCity(city);
 
+    if (!historyResponse.success) {
+      return res.status(400).json(historyResponse);
+    }
+    const weatherData = await getWeather(city);
+    return res.json(weatherData);
 
+    // error handling
+  } catch (error) {
+    console.error("Error saving city and fetching weather:", error);
+    return res.status(500).json({ error: "Failed to save city and fetch weather" });
+  }
+});
+
+/**
+ * GET /api/weather/history
+ * Retrieves the search history of previously searched cities.
+ */
+router.get("/history", async (_: Request, res: Response) => {
+  try {
+    const cities = await HistoryService.getCities();
+    return res.json(cities);
+
+    // error handling
+  } catch (error) {
+    console.error("Error fetching search history:", error);
+    return res.status(500).json({ error: "Failed to retrieve search history" });
+  }
+});
+
+/**
+ * DELETE /api/weather/history/:id
+ * Deletes a city from the search history by ID.
+ */
+router.delete("/history/:id", async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const deleteResponse = await HistoryService.removeCity(id);
+    if (!deleteResponse.success) {
+      return res.status(400).json(deleteResponse);
+    }
+
+    return res.json({ message: "City successfully deleted from history" });
+
+    // error handling
+  } catch (error) {
+    console.error("Error deleting city:", error);
+    return res.status(500).json({ error: "Failed to delete city" });
+  }
+});
+
+// Export the merged router
 export default router;
