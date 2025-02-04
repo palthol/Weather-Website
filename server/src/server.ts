@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Import routes
-import routes from './routes/centralRouter.js';
+import routes from './routes/router.js';
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
