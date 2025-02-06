@@ -1,7 +1,7 @@
 import express, { Request, Response, Router } from "express";
 import dotenv from "dotenv";
-import HistoryService from "../service/historyService";
-import { getWeather } from "../service/weatherService";
+import HistoryService from "../service/historyService.js";
+import { getWeather } from "../service/weatherService.js";
 
 dotenv.config();
 

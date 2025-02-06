@@ -1,10 +1,14 @@
 import fs from 'fs/promises';
-import path from 'path';
+import path, { dirname }from 'path';
+import { fileURLToPath } from 'url';
 
 // Define City class
 class City {
   constructor(public id: string, public name: string) {}
 }
+
+// ESM replacement for __dirname
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 class HistoryService {
   private readonly filePath = path.join(__dirname, 'searchHistory.json');

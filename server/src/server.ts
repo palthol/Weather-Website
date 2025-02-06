@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // API routes
-app.use('/', routes);
+app.use('/api/weather', routes);
 
 // SPA fallback for frontend routing
 app.get('*', (_, res) => {
