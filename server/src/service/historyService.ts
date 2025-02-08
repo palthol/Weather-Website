@@ -1,70 +1,67 @@
-import fs from 'fs/promises';
-import path, { dirname }from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs/promises';
+import { v4 as uuidv4 } from 'uuid';
 
-// Define City class
 class City {
-  constructor(public id: string, public name: string) {}
+  name: string;
+  id: string;
+
+  constructor(name: string, id: string) {
+    this.name = name;
+    this.id = id;
+  }
 }
 
-// ESM replacement for __dirname
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
 class HistoryService {
-  private readonly filePath = path.join(__dirname, 'searchHistory.json');
-
-  // Read from searchHistory.json
-  private async read(): Promise<City[]> {
-    try {
-      const data = await fs.readFile(this.filePath, 'utf-8');
-      return JSON.parse(data) as City[];
-    } catch (error) {
-      console.error('Error reading history file:', error);
-      return [];
-    }
+  private async read() {
+    return await fs.readFile('db/db.json', {
+      flag: 'a+',
+      encoding: 'utf8',
+    });
   }
 
-  // Write to searchHistory.json
-  private async write(cities: City[]): Promise<void> {
-    try {
-      await fs.writeFile(this.filePath, JSON.stringify(cities, null, 2), 'utf-8');
-    } catch (error) {
-      console.error('Error writing to history file:', error);
-    }
+  private async write(cities: City[]) {
+    return await fs.writeFile('db/db.json', JSON.stringify(cities, null, '\t'));
   }
 
-  // Get all saved cities
-  async getCities(): Promise<City[]> {
-    return await this.read();
+  async getCities() {
+    return await this.read().then((cities) => {
+      let parsedCities: City[];
+
+      // If cities isn't an array or can't be turned into one, send back a new empty array
+      try {
+        parsedCities = [].concat(JSON.parse(cities));
+      } catch (err) {
+        parsedCities = [];
+      }
+
+      return parsedCities;
+    });
   }
 
-  // Add a city to search history
-  async addCity(cityName: string): Promise<{ success: boolean; message: string }> {
-    const cities = await this.read();
-
-    // Prevent duplicates
-    if (cities.some(city => city.name.toLowerCase() === cityName.toLowerCase())) {
-      return { success: false, message: 'City is already in history' };
+  async addCity(city: string) {
+    if (!city) {
+      throw new Error('City cannot be blank');
     }
 
-    const newCity = new City(Date.now().toString(), cityName);
-    cities.push(newCity);
-    await this.write(cities);
+    // Add a unique id to the city using uuid package
+    const newCity: City = { name: city, id: uuidv4() };
 
-    return { success: true, message: 'City added successfully' };
+    // Get all cities, add the new city, write all the updated cities, return the newCity
+    return await this.getCities()
+      .then((cities) => {
+        if (cities.find((index) => index.name === city)) {
+          return cities;
+        }
+        return [...cities, newCity];
+      })
+      .then((updatedCities) => this.write(updatedCities))
+      .then(() => newCity);
   }
 
-  // Remove a city from search history
-  async removeCity(id: string): Promise<{ success: boolean; message: string }> {
-    let cities = await this.read();
-    const newCities = cities.filter(city => city.id !== id);
-
-    if (cities.length === newCities.length) {
-      return { success: false, message: 'City not found' };
-    }
-
-    await this.write(newCities);
-    return { success: true, message: 'City removed successfully' };
+  async removeCity(id: string) {
+    return await this.getCities()
+      .then((cities) => cities.filter((city) => city.id !== id))
+      .then((filteredCities) => this.write(filteredCities));
   }
 }
 

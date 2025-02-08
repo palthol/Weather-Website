@@ -40,11 +40,7 @@ router.post("/", async (req: Request, res: Response) => {
     return res.status(400).json({ error: "City name is required" });
   }
   try {
-    const historyResponse = await HistoryService.addCity(city);
 
-    if (!historyResponse.success) {
-      return res.status(400).json(historyResponse);
-    }
     const weatherData = await getWeather(city);
     return res.json(weatherData);
 
